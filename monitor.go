@@ -28,11 +28,11 @@ type Monitor struct {
 
 // Start starts to monitor SSDP messages.
 func (m *Monitor) Start() error {
-	cfg, err := opts2config(m.Options)
+	cfg, err := Opts2config(m.Options)
 	if err != nil {
 		return err
 	}
-	conn, err := multicast.Listen(multicast.RecvAddrResolver, cfg.multicastConfig.options()...)
+	conn, err := multicast.Listen(multicast.RecvAddrResolver, cfg.MulticastConfig.Options()...)
 	if err != nil {
 		return err
 	}
