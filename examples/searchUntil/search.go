@@ -34,7 +34,13 @@ func main() {
 		opts = append(opts, ssdp.OnlySystemInterface())
 	}
 
-	list, err := ssdp.SearchUntil(*t, *w, *l, 1, opts...)
+	conn, err := ssdp.NewConn(*l, opts...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	list, err := ssdp.SearchUntil(*t, *w, conn, 1)
 	if err != nil {
 		log.Fatal(err)
 	}

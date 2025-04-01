@@ -116,13 +116,8 @@ func Search(searchType string, waitSec int, localAddr string, opts ...Option) ([
 	return list, err
 }
 
-// SearchUntil searches services by SSDP until it collects n responses or times out.
-// It returns on whichever happens first: collecting n responses or waiting for waitSec seconds.
-func SearchUntil(searchType string, waitSec int, localAddr string, n int, opts ...Option) ([]Service, error) {
-	if n <= 0 {
-		return nil, errors.New("n must be greater than 0")
-	}
-
+// Make multicast connection
+func NewConn(localAddr string, opts ...Option) (*multicast.Conn, error) {
 	cfg, err := opts2config(opts)
 	if err != nil {
 		return nil, err
@@ -133,8 +128,16 @@ func SearchUntil(searchType string, waitSec int, localAddr string, n int, opts .
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
-	ssdplog.Printf("search on %s", conn.LocalAddr().String())
+
+	return conn, nil
+}
+
+// SearchUntil searches services by SSDP until it collects n responses or times out.
+// It returns on whichever happens first: collecting n responses or waiting for waitSec seconds.
+func SearchUntil(searchType string, waitSec int, conn *multicast.Conn, n int) ([]Service, error) {
+	if n <= 0 {
+		return nil, errors.New("n must be greater than 0")
+	}
 
 	// send request.
 	addr, err := multicast.SendAddr()
