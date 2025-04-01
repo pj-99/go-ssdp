@@ -44,11 +44,11 @@ func Advertise(st, usn string, location interface{}, server string, maxAge int, 
 	if err != nil {
 		return nil, err
 	}
-	cfg, err := Opts2config(opts)
+	cfg, err := opts2config(opts)
 	if err != nil {
 		return nil, err
 	}
-	conn, err := multicast.Listen(multicast.RecvAddrResolver, cfg.MulticastConfig.Options()...)
+	conn, err := multicast.Listen(multicast.RecvAddrResolver, cfg.multicastConfig.options()...)
 	if err != nil {
 		return nil, err
 	}

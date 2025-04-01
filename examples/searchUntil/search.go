@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/koron/go-ssdp"
-	"github.com/koron/go-ssdp/internal/multicast"
 )
 
 func main() {
@@ -35,20 +34,7 @@ func main() {
 		opts = append(opts, ssdp.OnlySystemInterface())
 	}
 
-	// Make connection for listening the search response.
-	cfg, err := ssdp.Opts2config(opts)
-	if err != nil {
-		panic(err)
-	}
-
-	// dial multicast UDP packet.
-	conn, err := multicast.Listen(&multicast.AddrResolver{Addr: *l}, cfg.MulticastConfig.Options()...)
-	if err != nil {
-		panic(err)
-	}
-	defer conn.Close()
-
-	list, err := ssdp.SearchUntil(*t, *w, conn, 1)
+	list, err := ssdp.SearchUntil(*t, *w, *l, 1, opts...)
 	if err != nil {
 		log.Fatal(err)
 	}

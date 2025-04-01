@@ -71,12 +71,12 @@ const (
 
 // Search searches services by SSDP.
 func Search(searchType string, waitSec int, localAddr string, opts ...Option) ([]Service, error) {
-	cfg, err := Opts2config(opts)
+	cfg, err := opts2config(opts)
 	if err != nil {
 		return nil, err
 	}
 	// dial multicast UDP packet.
-	conn, err := multicast.Listen(&multicast.AddrResolver{Addr: localAddr}, cfg.MulticastConfig.Options()...)
+	conn, err := multicast.Listen(&multicast.AddrResolver{Addr: localAddr}, cfg.multicastConfig.options()...)
 	if err != nil {
 		return nil, err
 	}
@@ -118,10 +118,23 @@ func Search(searchType string, waitSec int, localAddr string, opts ...Option) ([
 
 // SearchUntil searches services by SSDP until it collects n responses or times out.
 // It returns on whichever happens first: collecting n responses or waiting for waitSec seconds.
-func SearchUntil(searchType string, waitSec int, conn *multicast.Conn, n int) ([]Service, error) {
+func SearchUntil(searchType string, waitSec int, localAddr string, n int, opts ...Option) ([]Service, error) {
 	if n <= 0 {
 		return nil, errors.New("n must be greater than 0")
 	}
+
+	cfg, err := opts2config(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	// dial multicast UDP packet.
+	conn, err := multicast.Listen(&multicast.AddrResolver{Addr: localAddr}, cfg.multicastConfig.options()...)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	ssdplog.Printf("search on %s", conn.LocalAddr().String())
 
 	// send request.
 	addr, err := multicast.SendAddr()

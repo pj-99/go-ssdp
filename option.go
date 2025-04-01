@@ -3,11 +3,11 @@ package ssdp
 import "github.com/koron/go-ssdp/internal/multicast"
 
 type config struct {
-	MulticastConfig
+	multicastConfig
 	advertiseConfig
 }
 
-func Opts2config(opts []Option) (cfg config, err error) {
+func opts2config(opts []Option) (cfg config, err error) {
 	for _, o := range opts {
 		err := o.apply(&cfg)
 		if err != nil {
@@ -17,12 +17,12 @@ func Opts2config(opts []Option) (cfg config, err error) {
 	return cfg, nil
 }
 
-type MulticastConfig struct {
+type multicastConfig struct {
 	ttl   int
 	sysIf bool
 }
 
-func (mc MulticastConfig) Options() (opts []multicast.ConnOption) {
+func (mc multicastConfig) options() (opts []multicast.ConnOption) {
 	if mc.ttl > 0 {
 		opts = append(opts, multicast.ConnTTL(mc.ttl))
 	}
